@@ -27,6 +27,7 @@ class Graph:
             "white"
         ]
         self.goal_types = [
+            "terminal_0",
             "terminal_1", "terminal_2",
             "terminal_3", "terminal_4",
             "terminal_5", "terminal_6",

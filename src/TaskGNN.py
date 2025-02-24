@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv, GATConv, global_mean_pool
+from torch_geometric.nn import GATConv, global_mean_pool
 from torch_geometric.data import Data, DataLoader
 
 class TaskGNN(torch.nn.Module):
@@ -33,9 +33,9 @@ class TaskGNN(torch.nn.Module):
 # Example usage
 input_dim = 5   # Feature vector size per node
 hidden_dim = 16 # Hidden layer size
-object_classes = 3  # Example: 3 different wires
-goal_classes = 5    # Example: 5 terminals
-action_classes = 4  # Actions: Pick, Place, Insert, Lock Screw
+object_classes = 5  # Example: 3 different wires
+goal_classes = 10    # Example: 5 terminals
+action_classes = 4  # Actions: Pick, Insert, Lock
 
 gnn = TaskGNN(input_dim, hidden_dim, object_classes, goal_classes, action_classes)
 

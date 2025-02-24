@@ -1,0 +1,19 @@
+{
+  "target_wire": {
+    "name": "blue_wire",
+    "color": "blue",
+    "coordinates": [
+      16,
+      57
+    ]
+  },
+  "target_terminal": {
+    "name": "terminal_0",
+    "coordinates": [
+      98,
+      15
+    ]
+  },
+  "correct_action": "pick",
+  "distance_to_terminal": 92.13034245024816
+}
