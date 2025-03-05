@@ -130,7 +130,7 @@ def modify_non_target(vision_data, y_labels):
     
 
 # Generate 200 samples
-for d in range(200):
+for d in range(500):
     vision_data = generate_vision_file()
     llm_data = generate_llm_file(vision_data)
     y_labels = generate_y_labels(vision_data, llm_data)
@@ -138,11 +138,11 @@ for d in range(200):
 
 
     # Save files in their respective folders
-    with open(f"{BASE_DIR}/vision/vision_{d}.json", "w") as f:
+    with open(f"{BASE_DIR}/vision/sample_{d}.json", "w") as f:
         json.dump(vision_data, f, indent=2)
-    with open(f"{BASE_DIR}/llm/llm_{d}.json", "w") as f:
+    with open(f"{BASE_DIR}/llm/sample_{d}.json", "w") as f:
         json.dump(llm_data, f, indent=2)
-    with open(f"{BASE_DIR}/labels/labels_{d}.json", "w") as f:
+    with open(f"{BASE_DIR}/labels/sample_{d}.json", "w") as f:
         json.dump(y_labels, f, indent=2)
 
-print("200 synthetic samples generated and sorted into separate directories.")
+print("500 synthetic samples generated and sorted into separate directories.")
