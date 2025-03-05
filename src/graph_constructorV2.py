@@ -65,8 +65,7 @@ class Graph:
         self.target_terminal = llm_data["target_terminal"]
         
         self.node_positions = self.wire_positions + self.terminal_positions
-        print(f"Check node positions :\n{self.node_positions}")
-                
+
         # Init encodings and graph structure
         self.wire_encodings = {}
         self.terminal_encodings = {}
@@ -126,62 +125,39 @@ class Graph:
         edge_features = []
         
         for i in range(self.edge_index.shape[1]):
-            print(f"Check Shape : {self.edge_index.shape[1]}")
             src, tgt = self.edge_index[:, i] # Get source and target nodes
+            wire_term_dict = {
+                "wires": [],
+                "terminals": []
+            }
             
-            if src <= len(self.detected_wires)-1: # src is a wire
+            edge_index_list = self.edge_index.tolist()
+            for item in edge_index_list[0]:
+                if item <= len(self.detected_wires)-1:
+                    wire_term_dict["wires"].append(item)
+                elif item > len(self.detected_wires)-1:
+                    wire_term_dict["terminals"].append(item)
+            if src in wire_term_dict["wires"]:
                 importance = 5.0 if (self.detected_wires[src] in target_object and self.terminals[tgt-len(self.detected_wires)] in target_goal) else 1.0
-            elif src > len(self.detected_wires)-1 and len(self.detected_wires) > tgt: # src is a terminal, tgt is a wire
-                print(len(self.detected_wires))
-                print(tgt)
+            elif src in wire_term_dict["terminals"] and tgt in wire_term_dict["wires"]:
                 importance = 5.0 if (self.detected_wires[tgt] in target_object and self.terminals[src-len(self.detected_wires)] in target_goal) else 1.0
-            elif src > len(self.detected_wires)-1 and len(self.detected_wires) < tgt: # Terminal to Terminal connection
+            else:
                 importance = 1.0
                  
             print(f"\nProcessing edge {i} - source: {src}, target: {tgt}\n")
-            print(f" Check src, tgt node positions : {self.node_positions[src], self.node_positions[tgt]}")
-            print(f"first index :\n{self.edge_index[0]}")
-            print(f"second index :\n{self.edge_index[1]}")
-            print(f"indexing ex :\n{self.edge_index[:,0]}")
-            print(f" Check Max : {self.edge_index.max()}")
-            print(f"Check Size : {self.edge_index.size(0)}")
 
             # print(self.node_positions[src], self.node_positions[tgt])
             distance = self.euclidean_distance(self.node_positions[src], self.node_positions[tgt])
-
-            # Task importance: Assign higher weight if edge connects LLM target wire and target terminal
-            print(f"Check src, tgt : {src, tgt}")
-            # if tgt < len(self.detected_wires):
-            #     if src < len(self.detected_wires):
-            #         importance = 5.0 if (self.detected_wires[src] in target_object and self.terminals[tgt] in target_goal) or (self.detected_wires[tgt] in target_object and self.terminals[src] in target_goal) else 1.0
-            #     elif src >= len(self.detected_wires):
-            #         importance = 5.0 if (self.detected_wires[tgt] in target_object and self.terminals[src-len(self.terminals)] in target_goal) else 1.0
-            #     print(f"tgt is less than length condition...")
-            # elif tgt >= len(self.detected_wires):
-            #     if src < len(self.detected_wires):
-            #         importance = 5.0 if (self.detected_wires[src] in target_object and self.terminals[tgt-len(self.detected_wires)] in target_goal) else 1.0
-            #     elif src >= len(self.detected_wires):
-            #         importance = 5.0 if (self.detected_wires[tgt-len(self.terminals)] in target_object and self.terminals[src] in target_goal) else 1.0
-            #     print(f"tgt is greater than length condition...")
-            # else:
-            #     print("WE ARE GETTING FUCKED...")  
-            # importance = 5.0 if (self.detected_wires[src] in target_object and self.terminals[tgt] in target_goal) or (self.detected_wires[tgt] in target_object and self.terminals[src] in target_goal) else 1.0
             if importance == 5.0:
                 print(f"Target wire: {target_object}, Target Terminal: {target_goal}\n")
                 print(f"Source Node: {src}, Target Node: {tgt}\n")
-            edge_features.append([distance, importance])   
+            edge_features.append([distance, importance])
+               
             print(f"\nEdge {i} features appended: Distance={distance}, Importance={importance}\n")
 
-            print(f"Node Positions Length: {len(self.node_positions)}")  # Should be 15
-            print(f"Edge Index Length: {self.edge_index.shape[1]}")  # Should be 210
-
-            print(f"Total edge features created: {len(edge_features)} (should be 210)")
-     
-        
         # Convert edge features to tensor
         self.edge_features = torch.tensor(edge_features, dtype=torch.float)        
     
-       
     def get_wire_encodings(self):
         return self.wire_encodings
     
@@ -230,19 +206,16 @@ def visualize_graph_with_features(graph, num):
     
     for i, (src, tgt) in enumerate(edges):
         distance, importance = edge_features[i]
-        # print(f"source and target: {(src, tgt)}")
 
         G.add_edge(src, tgt)
-        # print(f"labels: {(distance, importance)}")    
+          
         edge_labels[(src, tgt)] = f"D:{distance:.2f}, W:{importance}" # Distance and Weight
         edge_weights.append(importance) # Importance as thickness
         if importance == 5.0:
-            # edge_weights.append(10.0)
             edge_color.append("red")
             print(f"Visualize Source Node: {src}, Target Node: {tgt}\n")
-            # print(edge_weights[i])
+
         else:
-            # edge_weights.append(0.25)
             edge_color.append("gray")
 
     # Node postitions
@@ -254,15 +227,12 @@ def visualize_graph_with_features(graph, num):
     nx.draw(G, pos, node_color=colors, with_labels=True, labels=node_labels,
         edge_color=edge_color, node_size=4500, font_size=8, width=3.0)
     
-    # # Draw edge labels
-    # nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=8, font_color="green")
-    
     plt.title("Graph with Node & Edge Features")
     plt.savefig(f"../docs/graph_gen_example_sample{num}.pdf")
     plt.show()    
     
 
-for i in range(5):    
+for i in range(50):    
     # Input path
     vision_data_path = f'../synthetic_data/vision/sample_{i}.json'
     llm_data_path = f'../synthetic_data/llm/sample_{i}.json'
