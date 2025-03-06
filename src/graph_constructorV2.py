@@ -24,13 +24,14 @@ class Graph:
             "terminal_7", "terminal_8",
             "terminal_9"
         ]
-        colors = [
+        self.colors = [
             "red",
             "blue",
             "green",
             "yellow",
             "black",
-            "white"
+            "white",
+            
         ]
         
         # Process input data
@@ -41,14 +42,13 @@ class Graph:
         if label_in != None:
             with open(label_in, 'r') as label_file:
                 label_data = json.load(label_file)
+                self.target_action = label_data["correct_action"]
                 
         goal_states = []
         goal_positions = []
         
         # Process predefined data
         for terminal in terminals:
-
-            print(type(vision_data["terminals"][terminal]["state"]))
             goal_states.append(vision_data["terminals"][terminal]["state"])
             goal_positions.append(vision_data["terminals"][terminal]["coordinates"])
             
@@ -86,7 +86,7 @@ class Graph:
         return encoding
         
     def euclidean_distance(self, pos1, pos2):
-        print()
+        
         if type(pos1) == list and type(pos2) == list:
             pos1 = torch.tensor(pos1, dtype=torch.float32)  # Convert list to tensor
             pos2 = torch.tensor(pos2, dtype=torch.float32)  # Convert list to tensor
@@ -99,12 +99,16 @@ class Graph:
         # Encode wires
         for w, wire in enumerate(self.detected_wires):
             color, _ = wire.split("_")
-            wire_features = self.one_hot_encode(wire, self.detected_wires)
+            wire_features = self.one_hot_encode(color, self.colors)
             self.wire_encodings[f"wire_{w}"] = wire_features
             
         # Encode terminals
         for t, terminal in enumerate(self.terminals):
-            terminal_features = self.one_hot_encode(terminal, self.terminals) + self.one_hot_encode(self.terminal_states[t], ["empty", "inserted", "locked"])    
+            
+            terminal_features = self.one_hot_encode(
+                terminal, self.terminals) + self.one_hot_encode(self.terminal_states[t], ["empty", "inserted", "locked"]
+                                                                ) 
+                   
             self.terminal_encodings[terminal] = terminal_features
             
     def edge_index_adj_matrix(self):
@@ -137,23 +141,23 @@ class Graph:
                     wire_term_dict["wires"].append(item)
                 elif item > len(self.detected_wires)-1:
                     wire_term_dict["terminals"].append(item)
-            if src in wire_term_dict["wires"]:
+            if src in wire_term_dict["wires"] and tgt in wire_term_dict["terminals"]: # src is a wire, tgt is a terminal
                 importance = 5.0 if (self.detected_wires[src] in target_object and self.terminals[tgt-len(self.detected_wires)] in target_goal) else 1.0
-            elif src in wire_term_dict["terminals"] and tgt in wire_term_dict["wires"]:
+            elif src in wire_term_dict["terminals"] and tgt in wire_term_dict["wires"]: # src is a terminal and tgt is a wire
                 importance = 5.0 if (self.detected_wires[tgt] in target_object and self.terminals[src-len(self.detected_wires)] in target_goal) else 1.0
             else:
                 importance = 1.0
                  
-            print(f"\nProcessing edge {i} - source: {src}, target: {tgt}\n")
+            # print(f"\nProcessing edge {i} - source: {src}, target: {tgt}\n")
 
             # print(self.node_positions[src], self.node_positions[tgt])
             distance = self.euclidean_distance(self.node_positions[src], self.node_positions[tgt])
-            if importance == 5.0:
-                print(f"Target wire: {target_object}, Target Terminal: {target_goal}\n")
-                print(f"Source Node: {src}, Target Node: {tgt}\n")
+            # if importance == 5.0:
+            #     print(f"Target wire: {target_object}, Target Terminal: {target_goal}\n")
+            #     print(f"Source Node: {src}, Target Node: {tgt}\n")
             edge_features.append([distance, importance])
                
-            print(f"\nEdge {i} features appended: Distance={distance}, Importance={importance}\n")
+            # print(f"\nEdge {i} features appended: Distance={distance}, Importance={importance}\n")
 
         # Convert edge features to tensor
         self.edge_features = torch.tensor(edge_features, dtype=torch.float)        
@@ -171,75 +175,83 @@ class Graph:
         return self.adj_matrix
     
     def get_edge_features(self):
-        return self.edge_features       
+        return self.edge_features   
+    
+    def get_labels(self):
+        color, _ = self.target_wire.split("_")
+        target_wire = self.one_hot_encode(color, self.colors)
+        target_terminal = self.one_hot_encode(self.target_terminal, self.terminals)
+        target_action = self.one_hot_encode(self.target_action, ["pick", "insert", "lock"])
+        
+        return (torch.tensor(target_wire), torch.tensor(target_terminal), torch.tensor(target_action))    
                 
                 
                            
-def visualize_graph_with_features(graph, num):
+# def visualize_graph_with_features(graph, num):
 
-    G = nx.DiGraph() # Undirected Graph
+#     G = nx.DiGraph() # Undirected Graph
     
-    # Add nodes (Objects +Goals)
-    node_labels = {} # Labels for annotation
-    colors = [] # Node Colors
+#     # Add nodes (Objects +Goals)
+#     node_labels = {} # Labels for annotation
+#     colors = [] # Node Colors
     
-    num_objects = len(graph.detected_wires)
-    num_goals = len(graph.terminals)
+#     num_objects = len(graph.detected_wires)
+#     num_goals = len(graph.terminals)
     
-    for o, obj in enumerate(graph.detected_wires):
-        G.add_node(o, pos=graph.node_positions[o])
-        node_labels[o] = f"{obj}\n{graph.wire_encodings['wire_' +str(o)]}" # Show node features
-        colors.append("red") # Wire node color
+#     for o, obj in enumerate(graph.detected_wires):
+#         G.add_node(o, pos=graph.node_positions[o])
+#         node_labels[o] = f"{obj}\n{graph.wire_encodings['wire_' +str(o)]}" # Show node features
+#         colors.append("red") # Wire node color
         
-    for g, goal in enumerate(graph.terminals):
-        goal_idx = num_objects + g 
-        G.add_node(goal_idx, pos=graph.node_positions[goal_idx])
-        node_labels[goal_idx] = f"{goal}\n{graph.terminal_encodings[goal]}" # Show node features
-        colors.append("blue") # Terminal node color
+#     for g, goal in enumerate(graph.terminals):
+#         goal_idx = num_objects + g 
+#         G.add_node(goal_idx, pos=graph.node_positions[goal_idx])
+#         node_labels[goal_idx] = f"{goal}\n{graph.terminal_encodings[goal]}" # Show node features
+#         colors.append("blue") # Terminal node color
     
-    # Add edges with feature-based weights
-    edges = graph.get_edge_index().t().tolist()
-    edge_labels = {} # Store edge labels
-    edge_weights = [] # Store edge weights for visualization
-    edge_color = []
-    edge_features = graph.get_edge_features()
+#     # Add edges with feature-based weights
+#     edges = graph.get_edge_index().t().tolist()
+#     edge_labels = {} # Store edge labels
+#     edge_weights = [] # Store edge weights for visualization
+#     edge_color = []
+#     edge_features = graph.get_edge_features()
     
-    for i, (src, tgt) in enumerate(edges):
-        distance, importance = edge_features[i]
+#     for i, (src, tgt) in enumerate(edges):
+#         distance, importance = edge_features[i]
 
-        G.add_edge(src, tgt)
+#         G.add_edge(src, tgt)
           
-        edge_labels[(src, tgt)] = f"D:{distance:.2f}, W:{importance}" # Distance and Weight
-        edge_weights.append(importance) # Importance as thickness
-        if importance == 5.0:
-            edge_color.append("red")
-            print(f"Visualize Source Node: {src}, Target Node: {tgt}\n")
+#         edge_labels[(src, tgt)] = f"D:{distance:.2f}, W:{importance}" # Distance and Weight
+#         edge_weights.append(importance) # Importance as thickness
+#         if importance == 5.0:
+#             edge_color.append("red")
+#             print(f"Visualize Source Node: {src}, Target Node: {tgt}\n")
 
-        else:
-            edge_color.append("gray")
+#         else:
+#             edge_color.append("gray")
 
-    # Node postitions
-    pos = nx.kamada_kawai_layout(G) # Graph layout
-    # pos = nx.spring_layout(G)
+#     # Node postitions
+#     pos = nx.kamada_kawai_layout(G) # Graph layout
+#     # pos = nx.spring_layout(G)
 
-    # Draw graph
-    plt.figure(figsize=(20, 17))
-    nx.draw(G, pos, node_color=colors, with_labels=True, labels=node_labels,
-        edge_color=edge_color, node_size=4500, font_size=8, width=3.0)
+#     # Draw graph
+#     plt.figure(figsize=(20, 17))
+#     nx.draw(G, pos, node_color=colors, with_labels=True, labels=node_labels,
+#         edge_color=edge_color, node_size=4500, font_size=8, width=3.0)
     
-    plt.title("Graph with Node & Edge Features")
-    plt.savefig(f"../docs/graph_gen_example_sample{num}.pdf")
-    plt.show()    
+#     plt.title("Graph with Node & Edge Features")
+#     plt.savefig(f"../docs/graph_gen_example_sample{num}.pdf")
+#     plt.show()    
     
 
-for i in range(50):    
-    # Input path
-    vision_data_path = f'../synthetic_data/vision/sample_{i}.json'
-    llm_data_path = f'../synthetic_data/llm/sample_{i}.json'
-    y_data_path = f'../synthetic_data/labels/sample_{i}.json'
+# for i in range(50):    
+#     # Input path
+#     vision_data_path = f'../synthetic_data/vision/sample_{i}.json'
+#     llm_data_path = f'../synthetic_data/llm/sample_{i}.json'
+#     y_data_path = f'../synthetic_data/labels/sample_{i}.json'
 
-    graph = Graph(vision_data_path, llm_data_path)
-    graph.gen_encodings()
+#     graph = Graph(vision_data_path, llm_data_path)
+#     graph.gen_encodings()
 
-    # Call visualization function
-    visualize_graph_with_features(graph, num=i)
+#     # Call visualization function
+#     visualize_graph_with_features(graph, num=i)
