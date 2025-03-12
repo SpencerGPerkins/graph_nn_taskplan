@@ -2,16 +2,16 @@ import json
 import os
 
 # Define paths to the three directories
-labels_dir = "../synthetic_data/labels"
-llm_dir = "../synthetic_data/llm"
-vision_dir = "../synthetic_data/vision"
+labels_dir = "../synthetic_testing_data/labels_test"
+llm_dir = "../synthetic_testing_data/llm_test"
+vision_dir = "../synthetic_testing_data/vision_test"
 
 # Function to load JSON files
 def load_json(file_path):
     with open(file_path, "r") as f:
         return json.load(f)
     
-action_counters = {"pick": 0, "insert": 0, "lock": 0}
+action_counters = {"pick": 0, "insert": 0, "lock": 0, "putdown":0}
 lock_counter = 0
 insert_counter = 0
 pick_counter = 0
@@ -63,5 +63,5 @@ for f, filename in enumerate(os.listdir(labels_dir)):
             assert labels["target_wire"]["coordinates"] == labels["target_terminal"]["coordinates"], \
                 f"Target wire and terminal coordinates should match for lock action in {filename}"
     print(f"{f+1} file(s) checked...")
-    print(f"Totals: Pick {action_counters['pick']}, Insert {action_counters['insert']}, Lock {action_counters['lock']}")
+    print(f"Totals: Pick {action_counters['pick']}, Insert {action_counters['insert']}, Lock {action_counters['lock']}, Putdown {action_counters['putdown']}")
 print("All consistency checks passed!")

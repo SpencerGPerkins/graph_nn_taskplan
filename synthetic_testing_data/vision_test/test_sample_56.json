@@ -1,0 +1,121 @@
+{
+  "wires": [
+    {
+      "name": "blue_wire",
+      "color": "blue",
+      "state": "on_table",
+      "coordinates": [
+        90,
+        93
+      ]
+    },
+    {
+      "name": "yellow_wire",
+      "color": "yellow",
+      "state": "inserted",
+      "coordinates": [
+        90,
+        20
+      ]
+    },
+    {
+      "name": "yellow_wire",
+      "color": "yellow",
+      "state": "inserted",
+      "coordinates": [
+        3,
+        89
+      ]
+    },
+    {
+      "name": "black_wire",
+      "color": "black",
+      "state": "inserted",
+      "coordinates": [
+        55,
+        51
+      ]
+    },
+    {
+      "name": "green_wire",
+      "color": "green",
+      "state": "on_table",
+      "coordinates": [
+        49,
+        64
+      ]
+    }
+  ],
+  "terminals": {
+    "terminal_0": {
+      "state": "locked",
+      "coordinates": [
+        55,
+        51
+      ]
+    },
+    "terminal_1": {
+      "state": "locked",
+      "coordinates": [
+        3,
+        89
+      ]
+    },
+    "terminal_2": {
+      "state": "empty",
+      "coordinates": [
+        49,
+        29
+      ]
+    },
+    "terminal_3": {
+      "state": "empty",
+      "coordinates": [
+        22,
+        28
+      ]
+    },
+    "terminal_4": {
+      "state": "empty",
+      "coordinates": [
+        37,
+        100
+      ]
+    },
+    "terminal_5": {
+      "state": "empty",
+      "coordinates": [
+        45,
+        96
+      ]
+    },
+    "terminal_6": {
+      "state": "empty",
+      "coordinates": [
+        50,
+        13
+      ]
+    },
+    "terminal_7": {
+      "state": "empty",
+      "coordinates": [
+        41,
+        70
+      ]
+    },
+    "terminal_8": {
+      "state": "inserted",
+      "coordinates": [
+        90,
+        20
+      ]
+    },
+    "terminal_9": {
+      "state": "empty",
+      "coordinates": [
+        12,
+        50
+      ]
+    }
+  }
+}
