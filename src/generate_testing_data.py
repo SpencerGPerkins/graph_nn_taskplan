@@ -3,7 +3,7 @@ import random
 import os
 import math
 
-BASE_DIR = "synthetic_data"
+BASE_DIR = "../synthetic_data"
 os.makedirs(f"{BASE_DIR}/vision_test", exist_ok=True)
 os.makedirs(f"{BASE_DIR}/llm_test", exist_ok=True)
 os.makedirs(f"{BASE_DIR}/labels_test", exist_ok=True)
@@ -130,7 +130,7 @@ def modify_non_target(vision_data, y_labels):
     
 
 # Generate samples
-for d in range(70):
+for d in range(200):
     vision_data = generate_vision_file()
     print(vision_data)
     llm_data = generate_llm_file(vision_data)

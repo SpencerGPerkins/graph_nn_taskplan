@@ -1,0 +1,19 @@
+{
+  "target_wire": {
+    "name": "red_wire",
+    "color": "red",
+    "coordinates": [
+      25,
+      9
+    ]
+  },
+  "target_terminal": {
+    "name": "terminal_2",
+    "coordinates": [
+      7,
+      91
+    ]
+  },
+  "correct_action": "pick",
+  "distance_to_terminal": 83.95236744726142
+}

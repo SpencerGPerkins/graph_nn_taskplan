@@ -56,7 +56,7 @@ def visualize_graph(graph):
     nx.draw(G, pos, node_color=colors, with_labels=True, labels=node_labels, node_size=4500, font_size=8, width=3.0)
     dir = f"../docs/figures/{year}_{month}_{day}/"
     os.makedirs(dir, exist_ok=True)
-    save_path = os.path.join(dir, f"{hour}{minute}.pdf")
+    save_path = os.path.join(dir, f"{hour}{minute}.png")
     plt.savefig(save_path)
     
     plt.show()

@@ -3,12 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GATConv, global_mean_pool
 
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch_geometric.nn import GATConv
-
 class SingleHeadGAT(nn.Module):
     def __init__(self, in_dim, hidden_dim, max_wires, max_terminals, num_actions, heads=4):
         super(SingleHeadGAT, self).__init__()

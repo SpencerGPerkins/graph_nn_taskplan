@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
+import pandas as pd
+from sklearn.metrics import confusion_matrix, classification_report
 
 # Load the saved test data
 with open("../docs/testing_results.json", "r") as f:
@@ -29,3 +31,12 @@ plt.yticks(fontsize=25)  # Adjust y-axis tick labels
 
 plt.savefig("../docs/confusion_test_3_class.png")
 plt.show()
+
+# Compute precision, recall, and F1-score
+report = classification_report(ground_truth, predicted, target_names=class_labels, output_dict=True)
+
+# Convert to DataFrame
+df = pd.DataFrame(report).transpose()
+
+# Save to CSV
+df.to_csv("../docs/classification_report_3_class.csv", index=True)

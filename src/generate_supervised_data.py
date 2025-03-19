@@ -3,7 +3,7 @@ import random
 import os
 import math
 
-BASE_DIR = "synthetic_data"
+BASE_DIR = "../synthetic_data/4_class"
 os.makedirs(f"{BASE_DIR}/vision", exist_ok=True)
 os.makedirs(f"{BASE_DIR}/llm", exist_ok=True)
 os.makedirs(f"{BASE_DIR}/labels", exist_ok=True)
@@ -130,7 +130,7 @@ def modify_non_target(vision_data, y_labels):
     
 
 # Generate 200 samples
-for d in range(500):
+for d in range(200):
     vision_data = generate_vision_file()
     llm_data = generate_llm_file(vision_data)
     y_labels = generate_y_labels(vision_data, llm_data)
@@ -145,4 +145,4 @@ for d in range(500):
     with open(f"{BASE_DIR}/labels/sample_{d}.json", "w") as f:
         json.dump(y_labels, f, indent=2)
 
-print("500 synthetic samples generated and sorted into separate directories.")
+print("200 synthetic samples generated and sorted into separate directories.")

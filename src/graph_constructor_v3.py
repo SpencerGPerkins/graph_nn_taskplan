@@ -17,8 +17,8 @@ class Graph:
             "8", "9"
         ] 
         self.states = ["on_table", "held", "inserted", "empty", "locked"]
-        self.actions = ["pick", "insert", "lock"]
-        # self.actions = ["pick", "insert", "lock", "putdown"]
+        # self.actions = ["pick", "insert", "lock"]
+        self.actions = ["pick", "insert", "lock", "putdown"]
         
         # Process input data
         with open(vision_in,'r') as vision_file: 
@@ -118,9 +118,9 @@ class Graph:
         for t, terminal in enumerate(self.terminals):
             terminal_features = [0.,1.]
             if terminal == self.target_terminal:
-                terminal_features.append(5.0) # Target wire weight
+                terminal_features.append(5.0) # Target terminal weight
             else:
-                terminal_features.append(1.0) # Target wire weight
+                terminal_features.append(1.0) 
             terminal_features.append(0.0) # Distance weight set to default
             terminal_state_encoding = self.one_hot_encode(self.terminal_states[t], self.states)
             for e, encoding in enumerate(terminal_state_encoding):
@@ -163,13 +163,13 @@ class Graph:
         n_nodes = self.edge_index_adj_matrix()
         return n_nodes
     
-# # Main script
-# vision_data = f"../synthetic_data/vision/"
-# llm_data = f"../synthetic_data/llm/"
-# label_data = f"../synthetic_data/labels/"
+# Main script
+vision_data = f"../synthetic_data/3_class/vision/"
+llm_data = f"../synthetic_data/3_class/llm/"
+label_data = f"../synthetic_data/3_class/labels/"
 
-# vision_data = f"{vision_data}sample_00.json"
-# llm_data = f"{llm_data}sample_00.json"
-# G = Graph(vision_data, llm_data)
-# G.gen_encodings()
-# visualize_graph(G)
+vision_data = f"{vision_data}sample_0.json"
+llm_data = f"{llm_data}sample_0.json"
+G = Graph(vision_data, llm_data)
+G.gen_encodings()
+visualize_graph(G)

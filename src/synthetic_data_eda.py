@@ -2,9 +2,9 @@ import json
 import os
 
 # Define paths to the three directories
-labels_dir = "../synthetic_testing_data/labels_test"
-llm_dir = "../synthetic_testing_data/llm_test"
-vision_dir = "../synthetic_testing_data/vision_test"
+labels_dir = "../synthetic_data/4_class/labels"
+llm_dir = "../synthetic_data/4_class/llm"
+vision_dir = "../synthetic_data/4_class/vision"
 
 # Function to load JSON files
 def load_json(file_path):
