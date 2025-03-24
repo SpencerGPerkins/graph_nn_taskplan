@@ -163,13 +163,13 @@ class Graph:
         n_nodes = self.edge_index_adj_matrix()
         return n_nodes
     
-# Main script
-vision_data = f"../synthetic_data/3_class/vision/"
-llm_data = f"../synthetic_data/3_class/llm/"
-label_data = f"../synthetic_data/3_class/labels/"
+# # Main script
+# vision_data = f"../synthetic_data/3_class/vision/"
+# llm_data = f"../synthetic_data/3_class/llm/"
+# label_data = f"../synthetic_data/3_class/labels/"
 
-vision_data = f"{vision_data}sample_0.json"
-llm_data = f"{llm_data}sample_0.json"
-G = Graph(vision_data, llm_data)
-G.gen_encodings()
-visualize_graph(G)
+# vision_data = f"{vision_data}sample_0.json"
+# llm_data = f"{llm_data}sample_0.json"
+# G = Graph(vision_data, llm_data)
+# G.gen_encodings()
+# visualize_graph(G)

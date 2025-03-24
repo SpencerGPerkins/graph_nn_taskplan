@@ -5,6 +5,8 @@ from torch_geometric.data import Data, DataLoader
 from sklearn.metrics import f1_score, accuracy_score
 from graph_constructor_v3 import Graph
 from  SingleHeadGAT import SingleHeadGAT
+from GraphSAGE_GAT import GraphSAGE_GAT
+import pandas as pd
 
 # Load dataset and create graph instances
 def load_dataset(vision_path, llm_path, label_path, num_data_samples):
@@ -63,10 +65,13 @@ def train(model, loader, optimizer,criterion, device):
         data = data.to(device)
         optimizer.zero_grad()
         
+        # action_logits = model(
+        #     data.x.float(), data.edge_index, data.batch,
+        #     num_wires=len(data.x) - 10,  # Assuming last 10 nodes are terminals
+        #     num_terminals=10
+        # )
         action_logits = model(
-            data.x.float(), data.edge_index, data.batch,
-            num_wires=len(data.x) - 10,  # Assuming last 10 nodes are terminals
-            num_terminals=10
+            data.x.float(), data.edge_index, data.batch
         )
 
         # Unpack labels
@@ -109,11 +114,15 @@ def validate(model, loader, criterion, device):
     with torch.no_grad():
         for data in loader:
             data = data.to(device)
+            # action_logits = model(
+            #     data.x.float(), data.edge_index,data.batch,
+            #     num_wires=len(data.x) - 10,
+            #     num_terminals=10
+            # )
             action_logits = model(
-                data.x.float(), data.edge_index,data.batch,
-                num_wires=len(data.x) - 10,
-                num_terminals=10
+                data.x.float(), data.edge_index, data.batch
             )
+
 
         # Unpack labels
         print(f"data.y: {data.y}")
@@ -148,6 +157,15 @@ def validate(model, loader, criterion, device):
 
 def main():
     # Main script
+    training_results = {
+        "epoch": [],
+        "train_loss": [],
+        "train_acc": [],
+        "train_f1": [],
+        "val_loss":[],
+        "val_acc": [],
+        "val_f1": []
+        }
     vision_data = f"../synthetic_data/4_class/vision/"
     llm_data = f"../synthetic_data/4_class/llm/"
     label_data = f"../synthetic_data/4_class/labels/"
@@ -165,8 +183,8 @@ def main():
     
     checkpoint = torch.load("model_weights.pth", map_location="cpu")
     
-    model = SingleHeadGAT(in_dim=len(dataset[0].x[0]), hidden_dim=16, max_wires=10000, max_terminals=10, num_actions=4).to(device)
-    
+    model = GraphSAGE_GAT(in_dim=len(dataset[0].x[0]), hidden_dim=16, max_wires=10000, max_terminals=10, num_actions=4).to(device)
+    # model = SingleHeadGAT(in_dim=len(dataset[0].x[0]), hidden_dim=16, max_wires=10000, max_terminals=10, num_actions=4).to(device)
     # Load only matching parameters
     model_dict = model.state_dict()
     pretrained_dict = {k: v for k, v in checkpoint.items() if k in model_dict and v.shape == model_dict[k].shape}
@@ -182,14 +200,24 @@ def main():
     action_criterion = torch.nn.CrossEntropyLoss()
     
     # Training loop
-    for epoch in range(20):
+    for epoch in range(500):
         train_loss, train_acc, train_f1 = train(model, train_loader, optimizer, action_criterion,  device=device)
         val_loss, val_acc, val_f1 = validate(model, val_loader,  action_criterion, device=device)
         print(f"Epoch {epoch+1}: Train Loss {train_loss:.4f}, Acc {train_acc:.4f}, F1 {train_f1:.4f} | Val Loss {val_loss:.4f}, Acc {val_acc:.4f}, F1 {val_f1:.4f}")
+        training_results["epoch"].append(epoch)
+        training_results["train_loss"].append(train_loss)
+        training_results["train_acc"].append(train_acc)
+        training_results["train_f1"].append(train_f1)
+        training_results["val_loss"].append(val_loss)
+        training_results["val_acc"].append(val_acc)
+        training_results["val_f1"].append(val_f1)
+        
         
     # Save the trained model
-    torch.save(model.state_dict(), "model_weights_4_class.pth")
+    torch.save(model.state_dict(), "GraphSAGE_model_weights_4_class.pth")
     print("Model weights saved.")    
+    results_df = pd.DataFrame.from_dict(training_results)
+    results_df.to_csv("../docs/training_results/graph_sage_0321.csv")
     
 if __name__ == "__main__":
     main()

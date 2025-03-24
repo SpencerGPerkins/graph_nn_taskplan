@@ -15,11 +15,13 @@ class SingleHeadGAT(nn.Module):
 
         self.action_head = nn.Linear(hidden_dim, num_actions)  # For actions, keep it as is (multi-class classification)
 
-    def forward(self, x, edge_index, batch, num_wires, num_terminals):
+    def forward(self, x, edge_index, batch):
         # Apply GAT layers with edge attention
         x = F.elu(self.gat1(x, edge_index))
         x = F.elu(self.gat2(x, edge_index))
+        print(f"X 1 : {x.shape}")
         x = self.global_pool(x, batch)  # Shape: [num_graphs, hidden_dim]
+        print(f"pool :{x.shape}")
 
         # Action head: Multi-class classification (softmax or other appropriate activation)
         action_logits = self.action_head(x)
