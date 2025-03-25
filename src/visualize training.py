@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-df = pd.read_csv("../docs/training_results/graph_sage_0321.csv")
+df = pd.read_csv("../docs/training_results/graph_sage_0324.csv")
 
 # Create a figure with 3 subplots
 fig, axs = plt.subplots(3, 1, figsize=(20, 25), constrained_layout=True)
@@ -33,7 +33,7 @@ axs[2].legend()
 
 # Adjust layout
 # plt.tight_layout()
-plt.savefig("../docs/training_results/graph_sage_0321.png")
+plt.savefig("../docs/training_results/graph_sage_0324.png")
 # Show the figure
 plt.show()
 

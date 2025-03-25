@@ -10,9 +10,6 @@ year = datetime.datetime.now().year
 hour = datetime.datetime.now().hour
 minute = datetime.datetime.now().minute
 
-import networkx as nx
-import matplotlib.pyplot as plt
-import os
 
 def visualize_graph(graph):
     global month, day, year, hour, minute
@@ -48,6 +45,7 @@ def visualize_graph(graph):
 
     # Compute layout
     pos = nx.kamada_kawai_layout(G)
+
 
     # Debugging: Check labels
     print(node_labels)

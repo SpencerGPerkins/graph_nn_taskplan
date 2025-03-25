@@ -1,14 +1,11 @@
 import torch
-from SingleHeadGAT import SingleHeadGAT
+from GraphSAGE_GAT import GraphSAGE_GAT
 from torch_geometric.data import Data
-from graph_constructor_v3 import Graph  # As
-
+from graph_constructor_partial import GraphCategorical  
 import json
 
 # Load the trained model
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = torch.device("cpu")
-
 
 data_saver = {
     "predicted_action":[],
@@ -22,7 +19,7 @@ for d in range(70):
     label_data = f"../synthetic_testing_data/4_class_testing/labels_test/test_sample_{d}.json"
 
     # Create a graph instance
-    graph = Graph(vision_in=vision_data, llm_in=llm_data, label_in=label_data)
+    graph = GraphCategorical(vision_in=vision_data, llm_in=llm_data, label_in=label_data)
     graph.gen_encodings()
 
     # Convert to PyG Data object
@@ -33,8 +30,8 @@ for d in range(70):
     data = Data(x=x, edge_index=edge_index, y=y.unsqueeze(0))  # Ensure format matches training
     data = data.to(device)
 
-    checkpoint = torch.load("model_weights.pth", map_location="cpu")
-    model = SingleHeadGAT(
+    checkpoint = torch.load("GraphSAGE_model_weights_4_class.pth", map_location="cpu")
+    model = GraphSAGE_GAT(
         in_dim=data.x.shape[1],  # Use the actual feature size
         hidden_dim=16, 
         max_wires=10000, 
@@ -52,15 +49,13 @@ for d in range(70):
     with torch.no_grad():
         # model.action_head.weight[-1] = torch.randn_like(model.action_head.weight[0])
         # model.action_head.bias[-1] = torch.tensor(0.0)  # Or another initialization strategy
-        model.load_state_dict(torch.load("model_weights_4_class.pth", map_location=device))
+        model.load_state_dict(torch.load("GraphSAGE_model_weights_4_class.pth", map_location=device))
         model.to(device)
         model.eval()  # Set model to evaluation mode
         # Run the model on the new sample
         # with torch.no_grad():
         action_logits = model(
             data.x.float(), data.edge_index, None,  # Assuming batch=None for single sample
-            num_wires=len(data.x) - 10,  # Assuming last 10 nodes are terminals
-            num_terminals=10
             )
         print(action_logits)
         # Convert logits to predicted class
@@ -72,8 +67,5 @@ for d in range(70):
 
         print(f"Predicted Action: {predicted_action}")
 
-with open("../docs/4_class_testing_results.json", "w") as file:
+with open("../docs/graphSAGE_testing_results_0324.json", "w") as file:
     json.dump(data_saver, file)
-    
-
-    

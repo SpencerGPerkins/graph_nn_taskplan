@@ -3,9 +3,8 @@ import json
 import torch
 from torch_geometric.data import Data, DataLoader
 from sklearn.metrics import f1_score, accuracy_score
-from graph_constructor_v3 import Graph
-from  SingleHeadGAT import SingleHeadGAT
-from GraphSAGE_GAT import GraphSAGE_GAT
+from graph_constructor_partial import GraphCategorical
+from  GraphSAGE_GAT import GraphSAGE_GAT
 import pandas as pd
 
 # Load dataset and create graph instances
@@ -17,7 +16,7 @@ def load_dataset(vision_path, llm_path, label_path, num_data_samples):
         label_data = f"{label_path}sample_{f}.json"
         
         # Create Graph instance
-        graph = Graph(
+        graph = GraphCategorical(
             vision_in=vision_data,
             llm_in=llm_data,
             label_in=label_data

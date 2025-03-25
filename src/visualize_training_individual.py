@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load data
-df = pd.read_csv("../docs/training_results/graph_sage_0321.csv")
+df = pd.read_csv("../docs/training_results/graph_sage_0324.csv")
 
 # Loss plot
 plt.figure()
