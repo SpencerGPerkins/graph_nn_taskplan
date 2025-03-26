@@ -16,7 +16,7 @@ ground_truth = np.array(test_data["ground_truth"])
 # Compute confusion matrix
 cm = confusion_matrix(ground_truth, predicted)
 
-# Define class labels (assuming 3 actions: 0, 1, 2)
+# Define class labels
 class_labels = ["Pick", "Insert", "Lock", "Putdown"]
 
 # Plot confusion matrix

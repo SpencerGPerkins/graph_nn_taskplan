@@ -1,0 +1,3 @@
+(pickup arm2 red_wire)
+(insert arm1 red_wire)
+(lock arm2 red_wire)

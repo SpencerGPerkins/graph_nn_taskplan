@@ -12,11 +12,11 @@ data_saver = {
     "ground_truth":[]
 }
 
-for d in range(70):
+for d in range(3):
     # Load a new sample
-    vision_data = f"../synthetic_testing_data/4_class_testing/vision_test/test_sample_{d}.json"
-    llm_data = f"../synthetic_testing_data/4_class_testing/llm_test/test_sample_{d}.json"
-    label_data = f"../synthetic_testing_data/4_class_testing/labels_test/test_sample_{d}.json"
+    vision_data = f"../pddl_comp_data/vision/test_timestamp_{d}.json"
+    llm_data = f"../pddl_comp_data/llm/test_timestamp_{d}.json"
+    label_data = f"../pddl_comp_data/labels/test_timestamp_{d}.json"
 
     # Create a graph instance
     graph = GraphCategorical(vision_in=vision_data, llm_in=llm_data, label_in=label_data)
@@ -67,5 +67,5 @@ for d in range(70):
 
         print(f"Predicted Action: {predicted_action}")
 
-with open("../docs/graphSAGE_testing_results_0324.json", "w") as file:
+with open("../docs/graphSAGE_pddl_comp.json", "w") as file:
     json.dump(data_saver, file)
