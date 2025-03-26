@@ -14,10 +14,12 @@ class GraphSAGE_GAT(torch.nn.Module):
         self.gat_conv = GATConv(hidden_dim, hidden_dim, heads=heads, dropout=dropout, concat=False)
         
         self.dropout = dropout
+        
         # Global pooling layer (e.g., mean pooling)
-        self.global_pool = global_mean_pool  # You can also try global_max_pool
+        self.global_pool = global_mean_pool  
 
-        self.action_head = nn.Linear(hidden_dim, num_actions)  # For actions, keep it as is (multi-class classification)
+        self.action_head = nn.Linear(hidden_dim, num_actions)  
+        
     def forward(self, x, edge_index, batch):
         # Step 1: GraphSAGE Layer
         x = self.sage_conv(x, edge_index)
