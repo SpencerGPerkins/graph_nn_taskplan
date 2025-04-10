@@ -17,14 +17,14 @@ def run_inference():
         "predicted_action":[],
         "previous_actions":[]
     }
-    with open("../run_data/action_executions.json", "r") as in_file:
+    with open("/home/ai/Desktop/simulation/extension/newstart_python/run_data/action_executions.json", "r") as in_file:
         history = json.load(in_file)
 
     data_saver["previous_actions"] = history["previous_actions"]
 
     # Load a new sample
-    vision_data = f"../run_data/vision/vision_to_gnn.json"
-    llm_data = f"../run_data/llm/llm_to_gnn.json"
+    vision_data = f"/home/ai/Desktop/simulation/extension/newstart_python/run_data/vision/vision_to_gnn.json"
+    llm_data = f"/home/ai/Desktop/simulation/extension/newstart_python/run_data/llm/llm_to_gnn.json"
 
 
     # Create a graph instance
@@ -56,9 +56,8 @@ def run_inference():
     from networkx.readwrite import json_graph
     graph_data = json_graph.node_link_data(G)
 
-    with open("../run_data/graph_output/inference_graph.json", "w") as f:
+    with open("/home/ai/Desktop/simulation/extension/newstart_python/run_data/graph_output/inference_graph.json", "w") as f:
         json.dump(graph_data, f)
-        print("saved")
 
 
     # Convert to PyG Data object
@@ -68,7 +67,7 @@ def run_inference():
     data = Data(x=x, edge_index=edge_index)  
     data = data.to(device)
 
-    checkpoint = torch.load("GraphSAGE_model_weights_4_class.pth", map_location="cpu")
+    checkpoint = torch.load("/home/ai/Desktop/simulation/extension/newstart_python/GraphSAGE_model_weights_4_class.pth", map_location="cpu")
     model = GraphSAGE_GAT(
         in_dim=data.x.shape[1],  # Use the actual feature size
         hidden_dim=16, 
@@ -78,7 +77,7 @@ def run_inference():
     )
 
     with torch.no_grad():
-        model.load_state_dict(torch.load("GraphSAGE_model_weights_4_class.pth", map_location=device))
+        model.load_state_dict(torch.load("/home/ai/Desktop/simulation/extension/newstart_python/GraphSAGE_model_weights_4_class.pth", map_location=device))
         model.to(device)
         model.eval()  
 
@@ -96,8 +95,5 @@ def run_inference():
 
         print(f"Predicted Action: {possible_actions[predicted_action[0]]}")
 
-    with open("../run_data/action_executions.json", "w") as file:
+    with open("/home/ai/Desktop/simulation/extension/newstart_python/run_data/action_executions.json", "w") as file:
         json.dump(data_saver, file)
-
-
-run_inference()
