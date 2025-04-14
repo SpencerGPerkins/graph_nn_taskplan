@@ -9,6 +9,7 @@ with open("../run_data/graph_output/inference_graph.json", "r") as f:
 
 # Reconstruct the NetworkX graph
 G = json_graph.node_link_graph(data)
+node_labels = {node: data.get("label", node) for node, data in G.nodes(data=True)}
 
 # Basic layout and visualization
 pos = nx.kamada_kawai_layout(G)  # or use nx.kamada_kawai_layout(G) for prettier layout

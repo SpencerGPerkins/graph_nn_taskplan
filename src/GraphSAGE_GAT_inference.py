@@ -4,6 +4,8 @@ from torch_geometric.data import Data
 from graph_constructor_partial import GraphCategorical  
 import json
 import networkx as nx
+from networkx.readwrite import json_graph
+
 
 def run_inference():
 
@@ -32,29 +34,87 @@ def run_inference():
     graph.gen_encodings()
     
     
-    # Create Network X graph for GUI visualization
-    G = nx.DiGraph()
+    # # Create Network X graph for GUI visualization
+    # G = nx.DiGraph()
 
-    wire_names = graph.detected_wires
-    terminal_names = graph.terminals
-    all_node_names = wire_names + terminal_names
+    # wire_names = graph.detected_wires
+    # terminal_names = graph.terminals
+    # all_node_names = wire_names + terminal_names
 
-    # Add nodes with features (optional)
-    for i, node in enumerate(all_node_names):
-        if i < len(graph.X_wires):
-            features = graph.X_wires[i]
-        else:
-            features = graph.X_terminals[i - len(graph.X_wires)]
-        G.add_node(node, features=features)
+    # # Add nodes with features (optional)
+    # for i, node in enumerate(all_node_names):
+    #     if i < len(graph.X_wires):
+    #         features = graph.X_wires[i]
+    #     else:
+    #         features = graph.X_terminals[i - len(graph.X_wires)]
+    #     G.add_node(node, features=features)
 
-    # Add edges from edge_index
-    edge_index = graph.get_edge_index()
-    for src, dst in edge_index.t().tolist():
-        G.add_edge(all_node_names[src], all_node_names[dst])
+    # # Add edges from edge_index
+    # edge_index = graph.get_edge_index()
+    # for src, dst in edge_index.t().tolist():
+    #     G.add_edge(all_node_names[src], all_node_names[dst])
 
-    # Save to JSON for GUI or any format you need
-    from networkx.readwrite import json_graph
+    # # Save to JSON for GUI or any format you need
+    # graph_data = json_graph.node_link_data(G)
+    # G = nx.Graph()
+    
+    # # Initialize node labels and colors
+    node_labels = {}
+    colors = []
+    wire_count = len(graph.detected_wires)
+    G = nx.Graph()
+    # Add wire nodes
+    for w, wire in enumerate(graph.detected_wires):
+        G.add_node(w, pos=graph.wire_positions[w])
+        node_labels[w] = f"{wire}\n{graph.X_wires[w]}"
+        colors.append("red" if graph.X_wires[w][2] == 5.0 else "blue")
+
+    # Add terminal nodes
+    for t, terminal in enumerate(graph.terminals):
+        t_idx = wire_count + t
+        G.add_node(t_idx, pos=graph.terminal_positions[t])
+        node_labels[t_idx] = f"Terminal_{terminal}\n{graph.X_terminals[t]}"
+        colors.append("blue")
+
+    # Add edges (still using integer indices)
+    edges = graph.get_edge_index().t().tolist()
+    for src, tgt in edges:
+        G.add_edge(src, tgt)
+
+# Optional: draw with labels and colors
+# pos = nx.get_node_attributes(G, 'pos')
+# nx.draw(G, pos, labels=node_labels, node_color=colors, with_labels=True)
+
+# Export for GUI or JSON
     graph_data = json_graph.node_link_data(G)
+    # node_labels = {}
+    # colors = []
+
+    # # Add wire nodes
+    # for w, wire in enumerate(graph.detected_wires):
+    #     G.add_node(w, pos=graph.wire_positions[w])
+    #     node_labels[w] = f"{wire}\n{graph.X_wires[w]}"
+        
+    #     # Color based on condition
+    #     colors.append("red" if graph.X_wires[w][2] == 5.0 else "blue")
+
+    # print(f"Number of terminals: {len(graph.terminals)}")
+    # print(f"Number of terminal features: {len(graph.X_terminals)}")
+    # # Add terminal nodes
+    # wire_count = len(graph.detected_wires)  # Number of wire nodes
+    # for t, terminal in enumerate(graph.terminals):
+    #     t_idx = wire_count + t  # Ensure terminal nodes have unique indices
+    #     G.add_node(t_idx, pos=graph.terminal_positions[t])
+    #     node_labels[t_idx] = f"Terminal_{terminal}\n{graph.X_terminals[t]}"  # Fixed indexing
+    #     colors.append("blue")
+
+    # # Add edges
+    # edges = graph.get_edge_index().t().tolist()
+    # for src, tgt in edges:
+    #     G.add_edge(src, tgt)
+    # graph_data = json_graph.node_link_data(G)
+
+
 
     with open("../run_data/graph_output/inference_graph.json", "w") as f:
         json.dump(graph_data, f)

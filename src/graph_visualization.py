@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import datetime
 import os
+from graph_constructor_partial import GraphCategorical
 
 
 month = datetime.datetime.now().month
@@ -58,3 +59,11 @@ def visualize_graph(graph):
     plt.savefig(save_path)
     
     plt.show()
+    
+vision_in = "../run_data/vision/vision_to_gnn.json"
+llm_in = "../run_data/llm/llm_to_gnn.json"
+
+G = GraphCategorical(vision_in, llm_in)
+G.gen_encodings()
+print(G)
+visualize_graph(G)
